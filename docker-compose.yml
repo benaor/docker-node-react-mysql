@@ -1,0 +1,63 @@
+version: "3"
+services:
+  # API
+  api:
+    image: api
+    build: ./backend/api
+    command: npx nodemon backend/api/api.js
+    volumes:
+      - ./backend/api:/usr/src/app
+      - nodemodules-api:/usr/src/app/node_modules
+    ports:
+      - 8080:8080
+    # networks:
+    #   - back
+    depends_on:
+      - database
+
+  # Web - react
+  web:
+    image: web
+    build: ./frontend/web
+    command: yarn run start
+    volumes:
+      - ./frontend/web:/app
+      - nodemodules-web:/app/node_modules
+    ports:
+      - 3000:3000
+    # networks:
+    #   - front
+
+  # Database MYSQL
+  database:
+    image: mysql:5.6
+    # ports:
+    #   - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: docker
+    volumes:
+      - bdd-data:/var/lib/mysql
+    # networks:
+    #   - back
+
+  # Adminer
+  adminer:
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+    ports:
+      - 8001:8080
+    # networks:
+    #   - back
+
+# networks:
+#   front:
+#     driver: bridge
+#   back:
+#     driver: bridge
+
+volumes:
+  nodemodules-api: {}
+  nodemodules-web: {}
+  bdd-data: {}
